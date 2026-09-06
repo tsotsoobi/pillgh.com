@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>account</title>
+<style>
+  :root {
+    --bg:   #0b0c0d;
+    --card: #121415;
+    --line: #22262a;
+    --fg:   #d9d9d4;
+    --dim:  #6b7176;
+    --pos:  #8fbf7f;
+    --neg:  #c8664f;
+    --warn: #d4a03c;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: 1rem 0.9rem 3rem;
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.45 var(--mono);
+    font-variant-numeric: tabular-nums;
+  }
+  main { max-width: 40rem; margin: 0 auto; }
+
+  .label { color: var(--dim); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .block { padding: 0.9rem 0 1.1rem; border-bottom: 1px solid var(--line); }
+
+  .balance { font-size: clamp(2.6rem, 15vw, 4rem); line-height: 1; margin: 0.35rem 0 0; letter-spacing: -0.02em; }
+  .balance .unit { font-size: 0.3em; color: var(--dim); letter-spacing: 0.1em; margin-left: 0.5em; }
+  .big { font-size: clamp(1.5rem, 8vw, 2.1rem); line-height: 1.1; margin: 0.35rem 0 0; }
+  .pos { color: var(--pos); }
+  .neg { color: var(--neg); }
+  .warn { color: var(--warn); }
+  .muted { color: var(--dim); }
+  .note { color: var(--dim); font-size: 12px; margin-top: 0.35rem; }
+
+  .stale-trade { border-left: 2px solid var(--warn); padding-left: 0.7rem; margin-left: -0.9rem; }
+
+  .windows { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+  .win .n { font-size: 1.9rem; line-height: 1.1; margin: 0.3rem 0 0; }
+  .win .net { font-size: 1rem; margin-top: 0.15rem; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 0.6rem; font-size: 12px; }
+  th { text-align: right; color: var(--dim); font-weight: normal; padding: 0 0 0.4rem; border-bottom: 1px solid var(--line); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+  th:first-child, td:first-child { text-align: left; }
+  td { text-align: right; padding: 0.3rem 0; border-bottom: 1px solid #16191b; white-space: nowrap; }
+  td:first-child { color: var(--dim); }
+  .wrap { overflow-x: auto; }
+
+  #banner { padding: 0.6rem 0.7rem; margin: 0 0 0.6rem; border-left: 2px solid var(--warn); background: var(--card); color: var(--warn); font-size: 12px; }
+  #banner.err { border-color: var(--neg); color: var(--neg); }
+
+  .mast { color: var(--dim); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; padding-bottom: 0.7rem; border-bottom: 1px solid var(--line); }
+
+  footer { color: var(--dim); font-size: 11px; margin-top: 1.6rem; line-height: 1.7; word-break: break-all; }
+  footer .k { display: inline-block; min-width: 5.5rem; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+
+  <div class="mast" id="mast"></div>
+
+  <div id="banner" hidden></div>
+
+  <section class="block">
+    <div class="label">native balance</div>
+    <div class="balance" id="balance">&mdash;<span class="unit">Test-Pi</span></div>
+  </section>
+
+  <section class="block" id="profit-block">
+    <div class="label">profit since funding</div>
+    <div class="big" id="profit">&mdash;</div>
+    <div class="note" id="profit-note"></div>
+  </section>
+
+  <section class="block" id="last-trade-block">
+    <div class="label">since last trade</div>
+    <div class="big" id="last-trade">&mdash;</div>
+    <div class="note" id="last-trade-note"></div>
+  </section>
+
+  <section class="block">
+    <div class="windows">
+      <div class="win">
+        <div class="label">trades today</div>
+        <div class="n" id="today-n">&mdash;</div>
+        <div class="net muted" id="today-net">&mdash;</div>
+      </div>
+      <div class="win">
+        <div class="label">trades 24h</div>
+        <div class="n" id="d1-n">&mdash;</div>
+        <div class="net muted" id="d1-net">&mdash;</div>
+      </div>
+    </div>
+    <div class="note" id="window-note"></div>
+  </section>
+
+  <section class="block">
+    <div class="label">fees paid today</div>
+    <div class="big" id="fees">&mdash;</div>
+    <div class="note" id="fees-note"></div>
+  </section>
+
+  <section class="block">
+    <div class="label">last 20 path payments</div>
+    <div class="wrap">
+      <table>
+        <thead>
+          <tr><th>time</th><th>in</th><th>out</th><th>net</th></tr>
+        </thead>
+        <tbody id="rows"><tr><td colspan="4" class="muted">loading&hellip;</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <div><span class="k">account</span><span id="f-account"></span></div>
+    <div><span class="k">horizon</span><span id="f-horizon"></span></div>
+    <div><span class="k">refreshed</span><span id="f-refreshed">never</span></div>
+    <div><span class="k">state</span><span id="f-state">starting</span></div>
+  </footer>
+
+</main>
+
+<script>
+"use strict";
+
+// ---- the only things to edit ------------------------------------------------
+//
+// A URL fragment overrides the account and the funding figure:
+// #<address> or #<address>,<funding>.
+//
+// This file names no account, no owner and no starting balance. The three
+// constants below are deliberately empty: what you watch lives in your
+// bookmark, not in this repository. Fill them in on a local copy if you want
+// one that needs no fragment.
+var ACCOUNT_DEFAULT = "";
+var ACCOUNT_LABEL   = "";
+var FUNDING_DEFAULT = null;   // no funding figure unless the fragment gives one
+var HORIZON = "https://api.testnet.minepi.com";
+// -----------------------------------------------------------------------------
+
+// A Stellar public key: 'G' and 55 more base32 characters. Checked before the
+// value is ever concatenated into a Horizon path, because the fragment is
+// whatever a link handed us and a path is not the place to find that out.
+var ACCOUNT_RE = /^G[A-Z2-7]{55}$/;
+
+var hash = decodeURIComponent(String(location.hash || "").replace(/^#/, "")).trim();
+var parts = hash ? hash.split(",") : [];
+var wanted = (parts[0] || "").trim().toUpperCase();
+
+var ACCOUNT = ACCOUNT_RE.test(wanted) ? wanted : (ACCOUNT_RE.test(ACCOUNT_DEFAULT) ? ACCOUNT_DEFAULT : "");
+var badHash = hash.length > 0 && !ACCOUNT_RE.test(wanted);
+
+// Funding is optional. null means "not told", and the profit panel hides
+// rather than showing a difference from a number nobody supplied.
+var FUNDING_PI = parts.length > 1 && parts[1].trim() !== "" && isFinite(Number(parts[1]))
+  ? Number(parts[1])
+  : (wanted && wanted !== ACCOUNT_DEFAULT ? null : FUNDING_DEFAULT);
+
+var REFRESH_MS    = 30 * 1000;
+var TRADE_WARN_MS = 60 * 60 * 1000;  // no trade for this long -> warning state
+var DATA_STALE_MS = 75 * 1000;       // last good read older than this -> say so
+var PAGE_LIMIT    = 200;
+var MAX_PAGES     = 10;              // hard ceiling on paging, per endpoint
+var TABLE_ROWS    = 20;
+var PATH_TYPES    = ["path_payment_strict_send", "path_payment_strict_receive"];
+
+// ---- exact decimal arithmetic ------------------------------------------------
+// Horizon sends amounts as 7-decimal strings. Parse them to integer stroops and
+// never let a float touch a balance.
+var STROOP = 10000000n;
+
+function toStroops(s) {
+  if (s === null || s === undefined) return 0n;
+  var str = String(s).trim();
+  var neg = str.charAt(0) === "-";
+  var body = neg ? str.slice(1) : str;
+  var dot = body.indexOf(".");
+  var whole = dot === -1 ? body : body.slice(0, dot);
+  var frac = dot === -1 ? "" : body.slice(dot + 1);
+  if (!/^\d*$/.test(whole) || !/^\d*$/.test(frac)) return 0n;
+  var v = BigInt(whole || "0") * STROOP + BigInt((frac + "0000000").slice(0, 7));
+  return neg ? -v : v;
+}
+
+function fmt(stroops, dp) {
+  if (dp === undefined) dp = 4;
+  var neg = stroops < 0n;
+  var abs = neg ? -stroops : stroops;
+  var whole = (abs / STROOP).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  var frac = (abs % STROOP).toString().padStart(7, "0").slice(0, dp);
+  return (neg ? "-" : "") + whole + (dp ? "." + frac : "");
+}
+
+function signed(stroops, dp) {
+  return (stroops > 0n ? "+" : "") + fmt(stroops, dp);
+}
+
+function signClass(stroops) {
+  return stroops > 0n ? "pos" : stroops < 0n ? "neg" : "muted";
+}
+
+function duration(ms) {
+  var s = Math.floor(ms / 1000);
+  if (s < 60) return s + "s";
+  var m = Math.floor(s / 60);
+  if (m < 60) return m + "m";
+  var h = Math.floor(m / 60);
+  if (h < 24) return h + "h " + (m % 60) + "m";
+  return Math.floor(h / 24) + "d " + (h % 24) + "h";
+}
+
+function pad(n) { return String(n).padStart(2, "0"); }
+
+// Local time. Anything from an earlier day carries its date.
+function clock(ms) {
+  var d = new Date(ms);
+  var midnight = new Date(); midnight.setHours(0, 0, 0, 0);
+  var hms = pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+  return d >= midnight ? hms : pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + hms;
+}
+
+// ---- Horizon -----------------------------------------------------------------
+function horizon(path, params) {
+  var url = new URL(HORIZON.replace(/\/+$/, "") + path);
+  Object.keys(params || {}).forEach(function (k) { url.searchParams.set(k, params[k]); });
+
+  return fetch(url.toString(), { headers: { Accept: "application/json" } })
+    .catch(function (e) {
+      throw new Error("cannot reach Horizon (network, DNS or CORS): " + (e && e.message ? e.message : e));
+    })
+    .then(function (res) {
+      if (res.ok) return res.json();
+      return res.json().catch(function () { return null; }).then(function (body) {
+        var msg = res.status + " " + (body && body.title ? body.title : res.statusText);
+        if (body && body.detail) msg += " — " + body.detail;
+        if (res.status === 404) msg += " (no such account on this Horizon)";
+        if (res.status === 429) msg += " (rate limited; backing off to the next refresh)";
+        throw new Error("Horizon " + msg);
+      });
+    });
+}
+
+// Walk descending pages until stop(records) is satisfied, the endpoint runs out,
+// or MAX_PAGES. complete:false means the answer is a lower bound, and the page
+// says so rather than pretending it is the whole truth.
+function pages(path, params, stop) {
+  var all = [];
+  var cursor = null;
+  var n = 0;
+
+  function step() {
+    var p = Object.assign({ order: "desc", limit: String(PAGE_LIMIT) }, params || {});
+    if (cursor) p.cursor = cursor;
+    return horizon(path, p).then(function (body) {
+      var recs = (body && body._embedded && body._embedded.records) || [];
+      all = all.concat(recs);
+      n += 1;
+      if (recs.length < PAGE_LIMIT) return { records: all, complete: true };
+      if (stop(all)) return { records: all, complete: true };
+      if (n >= MAX_PAGES) return { records: all, complete: false };
+      cursor = recs[recs.length - 1].paging_token;
+      return step();
+    });
+  }
+  return step();
+}
+
+// ---- state -------------------------------------------------------------------
+var lastOkAt = null;      // when a full load last succeeded
+var lastTradeAt = null;   // when the newest path payment landed
+var inFlight = false;
+var timer = null;
+
+function el(id) { return document.getElementById(id); }
+
+function setBanner(text, kind) {
+  var b = el("banner");
+  if (!text) { b.hidden = true; b.textContent = ""; return; }
+  b.hidden = false;
+  b.textContent = text;
+  b.className = kind === "err" ? "err" : "";
+}
+
+function setState(s) { el("f-state").textContent = s; }
+
+// ---- the load ----------------------------------------------------------------
+function load() {
+  if (inFlight) return;
+  inFlight = true;
+  setState("refreshing");
+
+  var now = Date.now();
+  var midnight = new Date(); midnight.setHours(0, 0, 0, 0);
+  var todayStart = midnight.getTime();
+  var d1Start = now - 24 * 60 * 60 * 1000;
+  var oldestNeeded = Math.min(todayStart, d1Start);
+
+  Promise.all([
+    horizon("/accounts/" + ACCOUNT, {}),
+    pages("/accounts/" + ACCOUNT + "/payments", {}, function (recs) {
+      var coversWindow = Date.parse(recs[recs.length - 1].created_at) < oldestNeeded;
+      var enoughRows = recs.filter(function (r) {
+        return PATH_TYPES.indexOf(r.type) !== -1;
+      }).length >= TABLE_ROWS;
+      return coversWindow && enoughRows;
+    }),
+    // include_failed, because a failed submission still pays the fee.
+    pages("/accounts/" + ACCOUNT + "/transactions", { include_failed: "true" }, function (recs) {
+      return Date.parse(recs[recs.length - 1].created_at) < todayStart;
+    })
+  ]).then(function (r) {
+    render({ account: r[0], pay: r[1], tx: r[2], todayStart: todayStart, d1Start: d1Start });
+    lastOkAt = Date.now();
+    setBanner("");
+    setState(document.hidden ? "paused (tab hidden)" : "live");
+  }).catch(function (e) {
+    var tail = lastOkAt
+      ? " Showing the last good read, " + duration(Date.now() - lastOkAt) + " old."
+      : " Nothing has loaded yet, so every number below is a placeholder.";
+    setBanner((e && e.message ? e.message : String(e)) + "." + tail, "err");
+    setState("error");
+  }).then(function () {
+    inFlight = false;
+    paint();
+  });
+}
+
+function render(d) {
+  // balance, and the profit over what was put in
+  var balances = d.account.balances || [];
+  var native = balances.filter(function (b) { return b.asset_type === "native"; })[0];
+  var balance = toStroops(native ? native.balance : "0");
+  el("balance").innerHTML = fmt(balance, 4) + '<span class="unit">Test-Pi</span>';
+
+  // Only meaningful if we were told what went in. Without it the panel goes
+  // away rather than subtracting from a number nobody supplied.
+  if (FUNDING_PI === null) {
+    el("profit-block").hidden = true;
+  } else {
+    el("profit-block").hidden = false;
+    var profit = balance - toStroops(String(FUNDING_PI));
+    var p = el("profit");
+    p.textContent = signed(profit, 4) + " Test-Pi";
+    p.className = "big " + signClass(profit);
+    el("profit-note").textContent = "balance minus the " + FUNDING_PI.toLocaleString()
+      + " Test-Pi it was funded with. Fees are already in it, so this is the bottom line.";
+  }
+
+  // path payments, newest first
+  var trades = d.pay.records.filter(function (r) {
+    return PATH_TYPES.indexOf(r.type) !== -1 && r.transaction_successful !== false;
+  });
+  lastTradeAt = trades.length ? Date.parse(trades[0].created_at) : null;
+
+  function net(r) { return toStroops(r.amount) - toStroops(r.source_amount); }
+
+  function window_(from) {
+    var rows = trades.filter(function (r) { return Date.parse(r.created_at) >= from; });
+    return {
+      n: rows.length,
+      net: rows.reduce(function (a, r) { return a + net(r); }, 0n)
+    };
+  }
+
+  [["today", window_(d.todayStart)], ["d1", window_(d.d1Start)]].forEach(function (pair) {
+    var id = pair[0], w = pair[1];
+    el(id + "-n").textContent = String(w.n);
+    var n = el(id + "-net");
+    n.textContent = signed(w.net, 4) + " Test-Pi";
+    n.className = "net " + signClass(w.net);
+  });
+
+  el("window-note").textContent =
+    "Net is what a route returned over what it sent, before the network fee. Today runs from local midnight; 24h is a rolling window."
+    + (d.pay.complete ? "" : " Paging stopped at " + (MAX_PAGES * PAGE_LIMIT) + " payments, so these are lower bounds.");
+
+  // fees today: every submission this account paid for, failures included
+  var txToday = d.tx.records.filter(function (t) {
+    return t.fee_account === ACCOUNT && Date.parse(t.created_at) >= d.todayStart;
+  });
+  var fees = txToday.reduce(function (a, t) { return a + BigInt(t.fee_charged || "0"); }, 0n);
+  var failed = txToday.filter(function (t) { return t.successful === false; }).length;
+  var f = el("fees");
+  f.textContent = "-" + fmt(fees, 4) + " Test-Pi";
+  f.className = "big " + (fees > 0n ? "neg" : "muted");
+  el("fees-note").textContent = txToday.length + " submission" + (txToday.length === 1 ? "" : "s")
+    + " today, " + failed + " failed. A failed submission still pays the flat fee, so both are counted."
+    + (d.tx.complete ? "" : " Paging stopped short, so this is a lower bound.");
+
+  // the last 20 path payments
+  var tbody = el("rows");
+  tbody.innerHTML = "";
+  if (!trades.length) {
+    var empty = document.createElement("tr");
+    var td = document.createElement("td");
+    td.colSpan = 4;
+    td.className = "muted";
+    td.textContent = "no path payments on this account";
+    empty.appendChild(td);
+    tbody.appendChild(empty);
+  } else {
+    trades.slice(0, TABLE_ROWS).forEach(function (r) {
+      var n = net(r);
+      var tr = document.createElement("tr");
+      var cells = [
+        [clock(Date.parse(r.created_at)), ""],
+        [fmt(toStroops(r.source_amount), 4), ""],
+        [fmt(toStroops(r.amount), 4), ""],
+        [signed(n, 4), signClass(n)]
+      ];
+      cells.forEach(function (c) {
+        var cell = document.createElement("td");
+        cell.textContent = c[0];
+        if (c[1]) cell.className = c[1];
+        tr.appendChild(cell);
+      });
+      tr.title = r.created_at + "  tx " + r.transaction_hash;
+      tbody.appendChild(tr);
+    });
+  }
+
+  el("f-account").textContent = ACCOUNT;
+  el("f-horizon").textContent = HORIZON;
+}
+
+// Repainted every second, so the two clocks that age between refreshes -- time
+// since the last trade, and how old the data is -- are never quietly wrong.
+function paint() {
+  var now = Date.now();
+
+  var since = el("last-trade");
+  var block = el("last-trade-block");
+  var note = el("last-trade-note");
+  if (lastTradeAt === null) {
+    since.textContent = lastOkAt ? "no trades on record" : "—";
+    since.className = "big muted";
+    block.className = "block";
+    note.textContent = "";
+  } else {
+    var age = now - lastTradeAt;
+    var warn = age > TRADE_WARN_MS;
+    since.textContent = duration(age);
+    since.className = warn ? "big warn" : "big";
+    block.className = warn ? "block stale-trade" : "block";
+    note.textContent = (warn ? "No trade in over 60 minutes. Last one at " : "Last trade at ")
+      + clock(lastTradeAt) + ".";
+  }
+
+  var r = el("f-refreshed");
+  if (lastOkAt === null) {
+    r.textContent = "never";
+    r.className = "";
+    return;
+  }
+  var dataAge = now - lastOkAt;
+  r.textContent = duration(dataAge) + " ago";
+  if (dataAge > DATA_STALE_MS && !document.hidden) {
+    r.className = "warn";
+    if (el("banner").hidden) {
+      setBanner("Stale: nothing has loaded for " + duration(dataAge)
+        + ". Every number below is that old.", "err");
+    }
+  } else {
+    r.className = "";
+  }
+}
+
+// ---- refresh loop, paused while the tab is hidden ----------------------------
+function startLoop() {
+  stopLoop();
+  timer = setInterval(load, REFRESH_MS);
+  load();
+}
+
+function stopLoop() {
+  if (timer) { clearInterval(timer); timer = null; }
+}
+
+document.addEventListener("visibilitychange", function () {
+  if (document.hidden) {
+    stopLoop();
+    setState("paused (tab hidden)");
+  } else {
+    setState("resuming");
+    startLoop();
+  }
+});
+
+setInterval(paint, 1000);
+
+// Set from the constants rather than written in the markup, so a copy with
+// those constants emptied carries no name anywhere.
+var LABEL = ACCOUNT_LABEL && ACCOUNT_DEFAULT && ACCOUNT === ACCOUNT_DEFAULT
+  ? ACCOUNT_LABEL
+  : (ACCOUNT ? ACCOUNT.slice(0, 4) + "…" + ACCOUNT.slice(-4) : "account");
+el("mast").textContent = LABEL;
+document.title = LABEL;
+
+el("f-account").textContent = ACCOUNT || "none";
+el("f-horizon").textContent = HORIZON;
+
+// A changed fragment is a different account. Reloading is the honest way to
+// swap: every counter, window and cached reading below belongs to the old one.
+window.addEventListener("hashchange", function () { location.reload(); });
+
+if (!ACCOUNT) {
+  // Nothing to poll. Say what the URL needs rather than sitting blank or, worse,
+  // asking Horizon for the empty string.
+  setBanner(badHash
+    ? "That fragment is not a Stellar address. Expected G followed by 55 characters."
+    : "No account. Add one to the URL: " + location.href.split("#")[0] + "#G…", "err");
+  setState("idle");
+  el("rows").innerHTML = "";
+  el("profit-block").hidden = true;
+} else if (document.hidden) {
+  setState("paused (tab hidden)");
+} else {
+  startLoop();
+}
+</script>
+</body>
+</html>
