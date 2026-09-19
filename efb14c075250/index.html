@@ -78,7 +78,7 @@
   </section>
 
   <section class="block" id="profit-block">
-    <div class="label">profit since funding</div>
+    <div class="label">trading result, at worst</div>
     <div class="big" id="profit">&mdash;</div>
     <div class="note" id="profit-note"></div>
   </section>
@@ -137,16 +137,25 @@
 
 // ---- the only things to edit ------------------------------------------------
 //
-// A URL fragment overrides the account and the funding figure:
-// #<address> or #<address>,<funding>.
+// A URL fragment overrides the account and both capital figures:
+// #<address>, or #<address>,<capital in>, or #<address>,<capital in>,<placed>.
+// Both figures are positive numbers -- what went in, and what is held
+// elsewhere. Neither is ever negative, which is what the old single net-capital
+// value could be, and reading as a double negative when it was.
 //
-// This file names no account, no owner and no starting balance. The three
+// This file names no account, no owner and no capital figures. The four
 // constants below are deliberately empty: what you watch lives in your
-// bookmark, not in this repository. Fill them in on a local copy if you want
-// one that needs no fragment.
+// bookmark, not in this repository. Fill them in on a local copy if you
+// want one that needs no fragment.
+//
+// The two capital figures are both positive. CAPITAL_IN is subtracted from
+// the balance; CAPITAL_PLACED is capital held elsewhere, which is counted as
+// gone in the figure and shown beside it as an upper bound. Capital that is
+// simply gone needs no constant -- it already lowered the balance.
 var ACCOUNT_DEFAULT = "";
 var ACCOUNT_LABEL   = "";
-var FUNDING_DEFAULT = null;   // no funding figure unless the fragment gives one
+var CAPITAL_IN     = null;   // no floor unless the fragment gives one
+var CAPITAL_PLACED = null;   // no upper bound unless the fragment gives one
 var HORIZON = "https://api.testnet.minepi.com";
 // -----------------------------------------------------------------------------
 
@@ -162,11 +171,18 @@ var wanted = (parts[0] || "").trim().toUpperCase();
 var ACCOUNT = ACCOUNT_RE.test(wanted) ? wanted : (ACCOUNT_RE.test(ACCOUNT_DEFAULT) ? ACCOUNT_DEFAULT : "");
 var badHash = hash.length > 0 && !ACCOUNT_RE.test(wanted);
 
-// Funding is optional. null means "not told", and the profit panel hides
+// Capital in is optional. null means "not told", and the profit panel hides
 // rather than showing a difference from a number nobody supplied.
-var FUNDING_PI = parts.length > 1 && parts[1].trim() !== "" && isFinite(Number(parts[1]))
-  ? Number(parts[1])
-  : (wanted && wanted !== ACCOUNT_DEFAULT ? null : FUNDING_DEFAULT);
+function fragNum(i, fallback) {
+  return parts.length > i && parts[i].trim() !== "" && isFinite(Number(parts[i]))
+    ? Number(parts[i])
+    : (wanted && wanted !== ACCOUNT_DEFAULT ? null : fallback);
+}
+var CAPITAL_IN_PI = fragNum(1, CAPITAL_IN);
+// Placed capital is optional even when capital in is given: without it the
+// panel simply shows the floor and claims no upper bound. 0 and null both
+// mean "no upper bound to show".
+var CAPITAL_PLACED_PI = fragNum(2, CAPITAL_PLACED) || 0;
 
 var REFRESH_MS    = 30 * 1000;
 var TRADE_WARN_MS = 60 * 60 * 1000;  // no trade for this long -> warning state
@@ -346,16 +362,29 @@ function render(d) {
 
   // Only meaningful if we were told what went in. Without it the panel goes
   // away rather than subtracting from a number nobody supplied.
-  if (FUNDING_PI === null) {
+  if (CAPITAL_IN_PI === null) {
     el("profit-block").hidden = true;
   } else {
     el("profit-block").hidden = false;
-    var profit = balance - toStroops(String(FUNDING_PI));
+    // The floor: balance less what was put in, and nothing added back. Every
+    // Test-Pi moved out by hand is treated as never returning, whether it is
+    // genuinely gone or merely held somewhere this page cannot value. That is
+    // the one direction the number is allowed to be wrong in.
+    var profit = balance - toStroops(String(CAPITAL_IN_PI));
     var p = el("profit");
     p.textContent = signed(profit, 4) + " Test-Pi";
     p.className = "big " + signClass(profit);
-    el("profit-note").textContent = "balance minus the " + FUNDING_PI.toLocaleString()
-      + " Test-Pi it was funded with. Fees are already in it, so this is the bottom line.";
+
+    var note = "balance minus the " + CAPITAL_IN_PI.toLocaleString()
+      + " Test-Pi put in. Every Test-Pi moved out by hand is counted as gone,"
+      + " so this is a floor, not an estimate. Trading fees are already in it.";
+    if (CAPITAL_PLACED_PI > 0) {
+      var ceiling = profit + toStroops(String(CAPITAL_PLACED_PI));
+      note += " A further " + CAPITAL_PLACED_PI.toLocaleString()
+        + " is placed elsewhere and not counted above; if all of it came back"
+        + " at face value the result would be " + signed(ceiling, 4) + ".";
+    }
+    el("profit-note").textContent = note;
   }
 
   // path payments, newest first
