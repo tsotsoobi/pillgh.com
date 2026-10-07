@@ -459,6 +459,7 @@ function App() {
             {['Services', 'Quote', 'Book', 'About', 'Contact'].map(item => (
               <a key={item} href={`#${item.toLowerCase()}`} className="text-sm font-medium text-slate-700 hover:text-[#1B2D5B] transition-colors">{item}</a>
             ))}
+            <a href="/blog/" className="text-sm font-medium text-slate-700 hover:text-[#1B2D5B] transition-colors">Blog</a>
             <a href="#book" className="px-5 py-2.5 rounded-full text-white text-sm font-semibold transition-all hover:shadow-lg" style={{ background: '#1B2D5B' }}>
               Get Started
             </a>
@@ -474,6 +475,7 @@ function App() {
             {['Services', 'Quote', 'Book', 'About', 'Contact'].map(item => (
               <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMenuOpen(false)} className="block text-sm font-medium text-slate-700 py-2">{item}</a>
             ))}
+            <a href="/blog/" className="block text-sm font-medium text-slate-700 py-2">Blog</a>
           </div>
         )}
       </nav>
@@ -1010,6 +1012,7 @@ function App() {
             </div>
             <div className="text-xs text-slate-400 text-center">© {new Date().getFullYear()} Pi Logistics Ltd. · pillgh.com · Reg. CS008320123</div>
             <div className="flex gap-3">
+              <a href="/blog/" className="self-center text-xs text-slate-300 hover:text-white mr-2">Blog</a>
               <a href="https://x.com/pillghana" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-[#2BA4E0] hover:text-[#2BA4E0] text-white transition-colors">
                 <Twitter className="w-4 h-4" />
               </a>

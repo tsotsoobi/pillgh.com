@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>105 million wallets: what Pi Testnet's ledger tells us | Pi Logistics</title>
+<meta name="description" content="Pi Testnet's ledger holds about 105 million accounts. How we counted them from the public history archive, what the number is and is not, and the questions it raises." />
+<meta name="author" content="Pi Logistics" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://pillgh.com/blog/105-million-wallets/" />
+
+<meta property="og:site_name" content="Pi Logistics" />
+<meta property="og:type" content="article" />
+<meta property="og:locale" content="en_GB" />
+<meta property="og:url" content="https://pillgh.com/blog/105-million-wallets/" />
+<meta property="og:title" content="105 million wallets: what Pi Testnet's ledger tells us" />
+<meta property="og:description" content="We counted Pi Testnet's accounts from its public history archive: about 105 million. What the number is, what it is not, and the questions it raises." />
+<meta property="og:image" content="https://pillgh.com/blog/105-million-wallets/share.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="105 million wallets: what Pi Testnet's ledger tells us. Pi Logistics blog." />
+<meta property="article:published_time" content="2026-10-07" />
+<meta property="article:author" content="Pi Logistics" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@pillghana" />
+<meta name="twitter:creator" content="@pillghana" />
+<meta name="twitter:title" content="105 million wallets: what Pi Testnet's ledger tells us" />
+<meta name="twitter:description" content="We counted Pi Testnet's accounts from its public history archive: about 105 million. What the number is, what it is not, and the questions it raises." />
+<meta name="twitter:image" content="https://pillgh.com/blog/105-million-wallets/share.png" />
+<meta name="twitter:image:alt" content="105 million wallets: what Pi Testnet's ledger tells us. Pi Logistics blog." />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "105 million wallets: what Pi Testnet's ledger tells us",
+  "datePublished": "2026-10-07",
+  "inLanguage": "en-GB",
+  "mainEntityOfPage": "https://pillgh.com/blog/105-million-wallets/",
+  "image": "https://pillgh.com/blog/105-million-wallets/share.png",
+  "author": { "@type": "Organization", "name": "Pi Logistics", "url": "https://pillgh.com/" },
+  "publisher": { "@type": "Organization", "name": "Pi Logistics Ltd.", "url": "https://pillgh.com/" }
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/blog/blog.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="brand">Pi Logistics Ltd.</a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/blog/">Blog</a>
+      <a href="/">Home</a>
+    </nav>
+  </div>
+</header>
+
+<main class="grain">
+  <article class="wrap article">
+
+    <p class="eyebrow">Pi Logistics blog</p>
+    <h1>105 million wallets: what Pi Testnet's ledger tells us</h1>
+    <p class="byline">By Pi Logistics (<a href="https://x.com/pillghana" rel="author">@pillghana</a>), <time datetime="2026-10-07">7 October 2026</time></p>
+
+    <p class="lede">Pi Testnet's ledger holds about 105 million accounts. We counted them on 7 October 2026, from the network's public history archive. The number is worth sitting with, not because it proves anything about Pi's future, but because of the questions it forces us to ask.</p>
+
+    <h2 id="how-we-counted">How we counted</h2>
+
+    <p>Pi's blockchain, like the Stellar network it builds on, regularly publishes a snapshot of its entire ledger to a public history archive. Anyone can read it. The snapshot we used, at ledger 27,042,879, is about 5 GB compressed, and almost all of that is account records.</p>
+
+    <p>Downloading 5 GB over a mobile connection in Accra was not an option, so we used a property of the format instead. Account records are stored in order of their public key, and they come before everything else. Public keys are effectively random, so the first slice of accounts is a fair random sample of all of them.</p>
+
+    <figure>
+      <img src="how-we-counted.svg" width="600" height="380" loading="lazy"
+           alt="Diagram of the ledger snapshot file as a long bar. Account records, in public key order, fill almost all of it; everything else comes after them. A small slice at the start is marked: first 5 MiB, 118,153 accounts, equal to 0.1125% of the key range. Below, the sum: 118,153 divided by 0.1125% equals about 105 million." />
+      <figcaption>How we counted: the first 5 MiB of the snapshot held 118,153 accounts, covering 0.1125% of the key range. The slice is enlarged; the diagram is not to scale.</figcaption>
+    </figure>
+
+    <p>The first 118,153 accounts covered 0.1125% of the possible key range. Dividing one by the other gives about 105 million accounts, with a statistical margin of roughly 0.3 million either way. A larger read of 472,805 accounts gave us the balance picture further down. The whole exercise used about 25 MB of data, and it never touched the network's live API servers.</p>
+
+    <h2 id="what-it-is">What 105 million is, and what it is not</h2>
+
+    <p>An account is not a person. Some of these accounts belong to Pioneers who opened a testnet wallet to try an app. Others were made by developers testing their code, by scripts, and by bots. One person can hold many; many accounts are never used again after the day they were created.</p>
+
+    <p>So 105 million is not a count of users, and it is certainly not a measure of wealth: Test-Pi has no monetary value. What it does measure is something easier to overlook. It is a record of how many times, and by how many hands, this network has been touched.</p>
+
+    <p>It also says something about the ledger itself. A system carrying 105 million accounts still closes a new ledger every few seconds. Whatever else one thinks about Pi, that is an engineering fact, and it was checked here rather than taken on trust.</p>
+
+    <h2 id="shape">The shape of the ledger</h2>
+
+    <p>Almost every account holds very little: 99.97% hold under 1,000 Test-Pi. Scaled up from our sample of 472,805 accounts, the picture looks like this:</p>
+
+    <figure>
+      <img src="accounts-by-balance.svg" width="600" height="462" loading="lazy"
+           alt="Horizontal bar chart on a log scale of estimated Pi Testnet accounts by balance band. Under 1,000 Test-Pi: about 105 million. 1,000 to 10,000: about 25,000. 10,000 to 100,000: a range from about 1,300 to 2,700. 100,000 or more: fewer than about 670, an upper bound. Source: sample of Pi Testnet history archive, ledger 27,042,879, 7 October 2026." />
+      <figcaption>Accounts by balance band. The horizontal axis is a log scale: each gridline is ten times the one before. Source: sample of Pi Testnet history archive, ledger 27,042,879, 7 October 2026.</figcaption>
+    </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">Balance (Test-Pi)</th><th scope="col">Estimated accounts on Pi Testnet</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Under 1,000</td><td>about 105 million (99.97%)</td></tr>
+          <tr><td>1,000 to 10,000</td><td>about 25,000</td></tr>
+          <tr><td>10,000 to 100,000</td><td>about 1,300 to 2,700</td></tr>
+          <tr><td>100,000 or more</td><td>fewer than about 670</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The last two rows rest on small numbers: 6 accounts in the 10,000 to 100,000 band, and none at all at 100,000 or more. That is why the bottom row is a ceiling (a 95% upper bound) rather than an estimate. A full read of every account would sharpen them; it would also cost the full 5 GB.</p>
+
+    <p>This is a long, thin tail. A very wide base of accounts holding almost nothing, a few tens of thousands holding a little, and a top band so sparse that half a million random accounts did not include a single member of it.</p>
+
+    <h2 id="disclosure">A disclosure</h2>
+
+    <p>Our own testnet trading bot, pi-pulse, held about 130,847 Test-Pi on the day we counted. That puts it in the top band, among fewer than about 670 accounts out of 105 million.</p>
+
+    <p>It started with about 10,000 Test-Pi. It got the rest by doing one dull thing around the clock: finding testnet liquidity pools whose prices disagreed, and trading between them until they agreed again.</p>
+
+    <p>We mention it because it makes a point better than any argument could. Rising into the top 0.0006% of a 105-million-account ledger, with automated code and no real money, does not describe wealth. It describes how thin and mispriced testnet markets are. That is exactly what a testnet is for, and it is worth remembering whenever anyone quotes a testnet number as if it described the real thing.</p>
+
+    <h2 id="questions">Three questions the number raises</h2>
+
+    <p><strong>1. Who carries the weight?</strong> Every node that validates the network keeps the full current state. On testnet, the account records alone come to about 4.7 GB compressed, before trustlines, offers and pools. Each new account makes every node slightly heavier for as long as it exists. That is the quiet cost of a large ledger: the bigger it grows, the more it takes to run a node, and the fewer people can. If mainnet grows the way testnet has, how will state size be kept within reach of the ordinary node operators the network depends on?</p>
+
+    <p><strong>2. What should we count?</strong> Accounts are cheap to create and easy to quote. Activity is harder to fake: transactions that do something, apps people return to, liquidity that can absorb a real trade. Our own monitor tracks 1,523 liquidity pools on Pi Testnet, and most of the 105 million accounts hold dust and never move. The more useful questions are how many accounts are active, how often, and doing what. A headline number without a method behind it should earn polite scepticism, including ours.</p>
+
+    <p><strong>3. What does the shape predict?</strong> A ledger with a wide base and a very thin top behaves in a particular way once real value is at stake. Prices are set by the few with depth, and the many feel every swing. Testnet balances do not predict mainnet balances, but testnet is where the mechanics of markets, pools and bots get rehearsed. If the rehearsal shows thin markets that a single bot can move, that is a lesson about liquidity worth learning before it costs anyone anything.</p>
+
+    <h2 id="pioneers">What Pioneers can do with this</h2>
+
+    <p>The most important thing about this number is not its size. It is that anyone could check it. The archive is public, the method fits in a paragraph, and the data cost less than a short video.</p>
+
+    <p>That is the habit worth building now, while the stakes are still Test-Pi:</p>
+
+    <ul>
+      <li><strong>Ask for the method.</strong> When someone quotes a figure about Pi, ask how it was measured and whether you could repeat it.</li>
+      <li><strong>Count activity, not just accounts.</strong> Sign-ups flatter; use tells the truth.</li>
+      <li><strong>Use the testnet for what it is for.</strong> Build, test and break things there, and watch what thin markets do, so that the mainnet versions are better.</li>
+    </ul>
+
+    <p>A hundred and five million accounts is a large number. What it becomes depends on what is built on it, and on whether the people building keep asking for evidence. The ledger is open. Read it.</p>
+
+    <p class="note"><em>Figures are estimates from a sample of Pi Testnet's public history archive at ledger 27,042,879 (7 October 2026). Test-Pi has no monetary value. Nothing here is financial advice.</em></p>
+
+  </article>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <span>&copy; 2026 Pi Logistics Ltd. &middot; Apt in Delivery</span>
+    <span><a href="/blog/">Blog</a> &middot; <a href="/">pillgh.com</a> &middot; <a href="https://x.com/pillghana">@pillghana</a></span>
+    <p class="disclaimer">Pi Logistics is not affiliated with Pi Network or its Core Team.</p>
+  </div>
+</footer>
+
+</body>
+</html>

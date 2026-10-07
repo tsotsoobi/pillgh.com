@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 380" width="600" height="380" role="img" aria-labelledby="t d" font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title id="t">How we counted</title>
+  <desc id="d">Diagram of the ledger snapshot file as a long bar. Account records, in public key order, fill almost all of it; everything else comes after them. A small slice at the start is marked: first 5 MiB, 118,153 accounts, equal to 0.1125% of the key range. Below, the sum: 118,153 divided by 0.1125% equals about 105 million. The slice is enlarged; the diagram is not to scale.</desc>
+
+  <rect width="600" height="380" fill="#ffffff"/>
+
+  <text x="20" y="32" font-size="20" font-weight="700" fill="#1B2D5B">How we counted</text>
+  <text x="20" y="64" font-size="15" fill="#475569">Snapshot file at ledger 27,042,879, about 5 GB compressed</text>
+
+  <!-- The file: account records first, then everything else -->
+  <rect x="20" y="80" width="526" height="48" fill="#1B2D5B"/>
+  <rect x="546" y="80" width="34" height="48" fill="#cbd5e1"/>
+  <line x1="546" y1="80" x2="546" y2="128" stroke="#ffffff" stroke-width="2"/>
+  <!-- First 5 MiB slice (enlarged) -->
+  <rect x="20" y="80" width="14" height="48" fill="#2BA4E0"/>
+  <line x1="34" y1="80" x2="34" y2="128" stroke="#ffffff" stroke-width="2"/>
+  <text x="290" y="110" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">Account records, in public key order</text>
+
+  <!-- Everything else label -->
+  <line x1="563" y1="128" x2="563" y2="148" stroke="#64748b" stroke-width="1.5"/>
+  <text x="580" y="166" font-size="14" fill="#475569" text-anchor="end">Everything else</text>
+
+  <!-- Slice callout -->
+  <line x1="27" y1="128" x2="27" y2="186" stroke="#2BA4E0" stroke-width="2"/>
+  <rect x="20" y="186" width="372" height="64" rx="8" fill="#e6f4fb" stroke="#2BA4E0" stroke-width="1.5"/>
+  <text x="34" y="212" font-size="16" font-weight="700" fill="#1B2D5B">first 5 MiB: 118,153 accounts</text>
+  <text x="34" y="236" font-size="16" fill="#1B2D5B">= 0.1125% of the key range</text>
+
+  <text x="580" y="200" font-size="12.5" font-style="italic" fill="#64748b" text-anchor="end">Slice enlarged;</text>
+  <text x="580" y="216" font-size="12.5" font-style="italic" fill="#64748b" text-anchor="end">not to scale</text>
+
+  <!-- The sum -->
+  <line x1="20" y1="282" x2="580" y2="282" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="300" y="322" font-size="24" font-weight="700" fill="#1B2D5B" text-anchor="middle">118,153 / 0.1125% = about 105 million</text>
+  <text x="300" y="352" font-size="14" fill="#64748b" text-anchor="middle">accounts on Pi Testnet, give or take roughly 0.3 million</text>
+</svg>
