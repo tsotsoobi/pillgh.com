@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 462" width="600" height="462" role="img" aria-labelledby="t d" font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title id="t">Pi Testnet accounts by balance band (log scale)</title>
+  <desc id="d">Horizontal bar chart on a log scale of estimated Pi Testnet accounts by balance band. Under 1,000 Test-Pi: about 105 million. 1,000 to 10,000: about 25,000. 10,000 to 100,000: a range from about 1,300 to 2,700. 100,000 or more: fewer than about 670, an upper bound. Source: sample of Pi Testnet history archive, ledger 27,042,879, 7 October 2026.</desc>
+
+  <rect width="600" height="462" fill="#ffffff"/>
+
+  <text x="20" y="32" font-size="20" font-weight="700" fill="#1B2D5B">Pi Testnet accounts by balance (Test-Pi)</text>
+
+  <!-- Gridlines: one per power of ten, from 1 (x=20) to 1,000,000,000 (x=580); 62.22 px per decade -->
+  <g stroke="#e2e8f0" stroke-width="1">
+    <line x1="82.2" y1="52" x2="82.2" y2="348"/>
+    <line x1="206.7" y1="52" x2="206.7" y2="348"/>
+    <line x1="331.1" y1="52" x2="331.1" y2="348"/>
+    <line x1="455.6" y1="52" x2="455.6" y2="348"/>
+    <line x1="580" y1="52" x2="580" y2="348"/>
+  </g>
+  <g stroke="#cbd5e1" stroke-width="1">
+    <line x1="144.4" y1="52" x2="144.4" y2="348"/>
+    <line x1="268.9" y1="52" x2="268.9" y2="348"/>
+    <line x1="393.3" y1="52" x2="393.3" y2="348"/>
+    <line x1="517.8" y1="52" x2="517.8" y2="348"/>
+  </g>
+
+  <!-- Under 1,000: about 105 million (log10 = 8.021) -->
+  <text x="20" y="72" font-size="16" font-weight="600" fill="#334155">Under 1,000</text>
+  <rect x="20" y="82" width="499.1" height="30" rx="3" fill="#1B2D5B"/>
+  <text x="509" y="103" font-size="16" font-weight="700" fill="#ffffff" text-anchor="end">about 105 million</text>
+
+  <!-- 1,000 to 10,000: about 25,000 (log10 = 4.398) -->
+  <text x="20" y="144" font-size="16" font-weight="600" fill="#334155">1,000 to 10,000</text>
+  <rect x="20" y="154" width="273.6" height="30" rx="3" fill="#1B2D5B"/>
+  <text x="302" y="175" font-size="16" font-weight="700" fill="#1B2D5B">about 25,000</text>
+
+  <!-- 10,000 to 100,000: range 1,300 (log10 = 3.114) to 2,700 (log10 = 3.431) -->
+  <text x="20" y="216" font-size="16" font-weight="600" fill="#334155">10,000 to 100,000</text>
+  <rect x="213.8" y="226" width="19.7" height="30" rx="2" fill="#2BA4E0"/>
+  <line x1="213.8" y1="222" x2="213.8" y2="260" stroke="#1B2D5B" stroke-width="2"/>
+  <line x1="233.5" y1="222" x2="233.5" y2="260" stroke="#1B2D5B" stroke-width="2"/>
+  <text x="242" y="247" font-size="16" font-weight="700" fill="#1B2D5B">about 1,300 to 2,700</text>
+
+  <!-- 100,000 or more: upper bound 670 (log10 = 2.826) -->
+  <text x="20" y="288" font-size="16" font-weight="600" fill="#334155">100,000 or more</text>
+  <rect x="21" y="299" width="174.8" height="28" rx="3" fill="none" stroke="#1B2D5B" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="204" y="319" font-size="16" font-weight="700" fill="#1B2D5B">fewer than about 670 (upper bound)</text>
+
+  <!-- Axis -->
+  <line x1="20" y1="348" x2="580" y2="348" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="20" y1="52" x2="20" y2="348" stroke="#64748b" stroke-width="1.5"/>
+  <g font-size="14" fill="#475569" text-anchor="middle">
+    <text x="22" y="370">1</text>
+    <text x="144.4" y="370">100</text>
+    <text x="268.9" y="370">10,000</text>
+    <text x="393.3" y="370">1 million</text>
+    <text x="517.8" y="370">100 million</text>
+  </g>
+  <text x="20" y="398" font-size="15" font-weight="600" fill="#334155">Number of accounts, LOG SCALE (each gridline is 10 times the last)</text>
+
+  <g font-size="13" fill="#64748b">
+    <text x="20" y="428">Source: Sample of Pi Testnet history archive,</text>
+    <text x="20" y="446">ledger 27,042,879, 7 October 2026</text>
+  </g>
+</svg>
